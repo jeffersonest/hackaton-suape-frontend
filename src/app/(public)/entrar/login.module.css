@@ -1,0 +1,399 @@
+/* ================================================
+   SPLIT LOGIN PAGE - Suape Identity
+   ================================================ */
+
+.container {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--bg-card);
+}
+
+/* ================================================
+   LEFT PANEL - Branding
+   ================================================ */
+.panelLeft {
+  flex: 1.1;
+  position: relative;
+  background: linear-gradient(135deg, #14488a 0%, #0e6fc4 50%, #0d4f7a 100%);
+  padding: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.panelContent {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Logo */
+.logo {
+  display: flex;
+  align-items: center;
+  animation: fadeSlideUp 0.5s ease-out;
+}
+
+.logoImage {
+  height: 120px;
+  width: auto;
+}
+
+/* Headline */
+.headline {
+  animation: fadeSlideUp 0.5s ease-out 0.1s both;
+}
+
+.headline h1 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 38px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin: 0 0 14px;
+  letter-spacing: -1px;
+}
+
+.headline p {
+  font-size: 17px;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Features */
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: fadeSlideUp 0.5s ease-out 0.2s both;
+}
+
+.feature {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 14px 0;
+  transition: all 0.2s ease;
+}
+
+.feature:hover {
+  transform: translateX(6px);
+}
+
+.featureIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-900);
+  flex-shrink: 0;
+}
+
+.featureText h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.featureText p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  animation: fadeSlideUp 0.5s ease-out 0.3s both;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.statNumber {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.statLabel {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.statDivider {
+  width: 1px;
+  height: 38px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Footer */
+.footer {
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  animation: fadeSlideUp 0.5s ease-out 0.3s both;
+}
+
+.footer p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0;
+  font-weight: 500;
+}
+
+.footerSub {
+  font-size: 11px !important;
+  color: rgba(255, 255, 255, 0.6) !important;
+  margin-top: 4px !important;
+  font-weight: 400 !important;
+}
+
+/* Background decoration */
+.bgDecoration {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bgCircle1 {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(244, 174, 56, 0.15) 0%, transparent 60%);
+  top: -150px;
+  right: -100px;
+}
+
+.bgCircle2 {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+  bottom: 10%;
+  left: -80px;
+}
+
+.bgCircle3 {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(14, 111, 196, 0.4) 0%, transparent 70%);
+  top: 40%;
+  right: 5%;
+}
+
+/* Organic wave shapes */
+.bgWaves {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  overflow: hidden;
+}
+
+.bgWave {
+  position: absolute;
+  bottom: 0;
+  width: 200%;
+  height: 100%;
+  background: rgba(14, 72, 138, 0.4);
+  border-radius: 45% 48% 0 0;
+}
+
+.bgWave:nth-child(1) {
+  animation: wave 18s linear infinite;
+  opacity: 0.5;
+}
+
+.bgWave:nth-child(2) {
+  animation: wave 14s linear infinite reverse;
+  opacity: 0.35;
+  bottom: -15px;
+  background: rgba(13, 79, 122, 0.4);
+}
+
+@keyframes wave {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================================================
+   RIGHT PANEL - Form
+   ================================================ */
+.panelRight {
+  flex: 0.9;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 48px;
+  background: var(--bg-card);
+}
+
+.panelRight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+.formContainer {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: fadeSlideUp 0.5s ease-out;
+}
+
+.footer {
+  margin-top: 20px;
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-default);
+  width: 100%;
+}
+
+.footer p {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.footer a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+/* ================================================
+   RESPONSIVE
+   ================================================ */
+@media (max-width: 1024px) {
+  .panelLeft {
+    flex: 1;
+    padding: 40px;
+  }
+
+  .panelContent {
+    max-width: 100%;
+  }
+
+  .headline h1 {
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .panelLeft {
+    flex: none;
+    padding: 32px 24px;
+    min-height: auto;
+  }
+
+  .panelContent {
+    gap: 28px;
+  }
+
+  .logo span {
+    font-size: 18px;
+  }
+
+  .headline h1 {
+    font-size: 26px;
+  }
+
+  .headline p {
+    font-size: 15px;
+  }
+
+  .features {
+    display: none;
+  }
+
+  .stats {
+    gap: 20px;
+  }
+
+  .statNumber {
+    font-size: 22px;
+  }
+
+  .panelRight {
+    flex: 1;
+    padding: 32px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .panelLeft {
+    padding: 24px 20px;
+  }
+
+  .headline h1 {
+    font-size: 22px;
+  }
+
+  .panelRight {
+    padding: 24px 20px;
+  }
+
+  .formContainer {
+    max-width: 100%;
+  }
+}
