@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeSlash, SignIn, Spinner } from "@phosphor-icons/react";
 import { useSessionStore } from "../stores/session-store";
 import { login as apiLogin } from "../api/auth-api";
+import { loginErrorMessage } from "../lib/errors";
 import type { LoginCredentials } from "../types";
 import styles from "./login-form.module.css";
 
@@ -14,7 +15,7 @@ interface LoginFormProps {
 
 export function LoginForm({ onSuccess }: LoginFormProps) {
   const router = useRouter();
-  const login = useSessionStore((state) => state.login);
+  const setUser = useSessionStore((state) => state.setUser);
 
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: "",
@@ -31,21 +32,15 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
     setIsLoading(true);
 
     try {
-      // Para desenvolvimento, simula login
-      // Em produção, usar: const data = await apiLogin(credentials);
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
-      login({
-        id: "1",
-        email: credentials.email,
-        name: "Usuário Suape",
-        accessToken: "dev-token",
-      }, "dev-token");
+      // Login real: o backend valida e seta os cookies httponly; aqui só
+      // guardamos o usuário retornado no estado de auth.
+      const { user } = await apiLogin(credentials);
+      setUser(user);
 
       onSuccess?.();
-      router.push("/home");
+      router.replace("/home");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao fazer login");
+      setError(loginErrorMessage(err));
     } finally {
       setIsLoading(false);
     }

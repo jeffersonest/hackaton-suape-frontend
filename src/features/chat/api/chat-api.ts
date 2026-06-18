@@ -1,8 +1,16 @@
+import { apiClient } from "@/lib/api-client";
+
 export interface StreamChatOptions {
   message: string;
   onChunk?: (text: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
+}
+
+interface AgentQueryResponse {
+  message?: string;
+  response?: string;
+  text?: string;
 }
 
 export async function streamChat({
@@ -11,23 +19,11 @@ export async function streamChat({
   onComplete,
   onError,
 }: StreamChatOptions): Promise<string> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
   try {
-    const response = await fetch(`${apiUrl}/agents/query`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const fullText = data.message || data.response || data.text || "";
+    // Passa pelo cliente central: envia os cookies (credentials:include) e
+    // renova a sessão automaticamente em caso de 401.
+    const data = await apiClient.post<AgentQueryResponse>("/agents/query", { message });
+    const fullText = data?.message || data?.response || data?.text || "";
 
     // Simula streaming character by character
     let currentText = "";

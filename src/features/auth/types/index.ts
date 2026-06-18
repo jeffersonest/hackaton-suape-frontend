@@ -1,8 +1,7 @@
+/** Usuário autenticado, no formato retornado pelo backend. */
 export interface AuthUser {
-  id: string;
+  identifier: string;
   email: string;
-  name: string;
-  accessToken: string;
 }
 
 export interface LoginCredentials {
@@ -10,8 +9,17 @@ export interface LoginCredentials {
   password: string;
 }
 
+/** Resposta de /auth/login e /auth/refresh. */
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user: AuthUser;
+}
+
+export type AuthStatus = "loading" | "authenticated" | "unauthenticated";
+
 export interface AuthState {
   user: AuthUser | null;
-  accessToken: string | null;
+  status: AuthStatus;
   isAuthenticated: boolean;
 }

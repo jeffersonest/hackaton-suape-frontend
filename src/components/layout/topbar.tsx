@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { List, CaretDown, SignOut, UserCircle } from "@phosphor-icons/react";
-import { useSessionStore } from "@/features/auth";
+import { useSessionStore, authApi } from "@/features/auth";
 import { Breadcrumb } from "./breadcrumb";
 import { Notifications } from "./notifications";
 import styles from "./topbar.module.css";
@@ -15,20 +15,21 @@ interface TopbarProps {
 export function Topbar({ onToggleSidebar }: TopbarProps) {
   const router = useRouter();
   const user = useSessionStore((state) => state.user);
-  const logout = useSessionStore((state) => state.logout);
+  const clearSession = useSessionStore((state) => state.clearSession);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const displayName = user?.name ?? "Usuário Suape";
   const displayEmail = user?.email ?? "";
-  const initials = displayName
-    .split(" ")
-    .map((part) => part[0])
-    .filter(Boolean)
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const displayName = displayEmail ? displayEmail.split("@")[0] : "Usuário Suape";
+  const initials =
+    displayName
+      .split(/[.\-_\s]+/)
+      .map((part) => part[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase() || "U";
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -41,9 +42,16 @@ export function Topbar({ onToggleSidebar }: TopbarProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
 
-  const handleLogout = () => {
-    logout();
-    router.replace("/entrar");
+  const handleLogout = async () => {
+    setMenuOpen(false);
+    try {
+      await authApi.logout();
+    } catch {
+      // Mesmo se a chamada falhar, limpamos o estado local por segurança.
+    } finally {
+      clearSession();
+      router.replace("/entrar");
+    }
   };
 
   return (

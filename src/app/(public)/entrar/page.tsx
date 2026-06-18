@@ -1,30 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ClipboardText, ChartLine, Shield } from "@phosphor-icons/react";
-import { LoginForm } from "@/features/auth/components";
+import { LoginForm, AuthSplash } from "@/features/auth/components";
 import { useSessionStore } from "@/features/auth";
 import styles from "./login.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
-  const accessToken = useSessionStore((state) => state.accessToken);
-  const [hydrated, setHydrated] = useState(false);
+  const status = useSessionStore((state) => state.status);
 
   useEffect(() => {
-    setHydrated(true);
-  }, []);
-
-  useEffect(() => {
-    if (hydrated && accessToken) {
+    if (status === "authenticated") {
       router.replace("/home");
     }
-  }, [hydrated, accessToken, router]);
+  }, [status, router]);
 
-  if (!hydrated) {
-    return null;
+  // Enquanto verifica a sessão (loading) ou se já está logado, mostra o splash
+  // para evitar o flash do formulário antes do redirecionamento.
+  if (status !== "unauthenticated") {
+    return <AuthSplash />;
   }
 
   return (

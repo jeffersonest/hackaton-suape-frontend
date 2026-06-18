@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Nunito_Sans } from "next/font/google";
+import { AuthProvider } from "@/features/auth";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -32,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body className={`${montserrat.variable} ${nunitoSans.variable}`}>
-        {children}
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
