@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { ChatMessage, PendingAttachment } from "../types";
 import { streamChat } from "../api/chat-api";
+import { stepLabel } from "../lib/steps";
 
 const WELCOME: ChatMessage = {
   id: "welcome",
@@ -19,6 +20,7 @@ interface ChatState {
   messages: ChatMessage[];
   conversationId: string | null;
   isStreaming: boolean;
+  steps: string[];
   send: (text: string, attachments?: PendingAttachment[]) => Promise<void>;
   stop: () => void;
   clear: () => void;
@@ -30,6 +32,7 @@ export const useChatStore = create<ChatState>()(
       messages: [WELCOME],
       conversationId: null,
       isStreaming: false,
+      steps: [],
 
       send: async (text, attachments) => {
         const pending = attachments ?? [];
@@ -57,6 +60,7 @@ export const useChatStore = create<ChatState>()(
         set((state) => ({
           messages: [...state.messages, userMessage, aiMessage],
           isStreaming: true,
+          steps: [],
         }));
 
         const patchAi = (patch: Partial<ChatMessage>) =>
@@ -74,6 +78,13 @@ export const useChatStore = create<ChatState>()(
             files,
             signal: abortController.signal,
             onConversation: (conversationId) => set({ conversationId }),
+            onStep: (name) =>
+              set((state) => {
+                const label = stepLabel(name);
+                return {
+                  steps: state.steps.includes(label) ? state.steps : [...state.steps, label],
+                };
+              }),
             onChunk: (fullText) => patchAi({ text: fullText }),
             onError: () => patchAi({ text: ERROR_TEXT }),
           });

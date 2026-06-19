@@ -6,13 +6,14 @@ export interface StreamChatOptions {
   signal?: AbortSignal;
   onChunk?: (fullText: string) => void;
   onAgent?: (agent: string) => void;
+  onStep?: (name: string) => void;
   onConversation?: (conversationId: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
 }
 
 interface SseEvent {
-  type: "conversation" | "handoff" | "token" | "done" | "error";
+  type: "conversation" | "handoff" | "step" | "token" | "done" | "error";
   content?: string;
   agent?: string;
   conversation_id?: string;
@@ -25,6 +26,7 @@ export async function streamChat(options: StreamChatOptions): Promise<string> {
     signal,
     onChunk,
     onAgent,
+    onStep,
     onConversation,
     onComplete,
     onError,
@@ -66,6 +68,7 @@ export async function streamChat(options: StreamChatOptions): Promise<string> {
     const fullText = await consumeStream(response.body, {
       onChunk,
       onAgent,
+      onStep,
       onConversation,
     });
 
@@ -80,7 +83,7 @@ export async function streamChat(options: StreamChatOptions): Promise<string> {
 
 async function consumeStream(
   body: ReadableStream<Uint8Array>,
-  handlers: Pick<StreamChatOptions, "onChunk" | "onAgent" | "onConversation">,
+  handlers: Pick<StreamChatOptions, "onChunk" | "onAgent" | "onStep" | "onConversation">,
 ): Promise<string> {
   const reader = body.getReader();
   const decoder = new TextDecoder();
@@ -105,6 +108,8 @@ async function consumeStream(
         handlers.onConversation?.(event.conversation_id);
       } else if (event.type === "handoff") {
         if (event.agent) handlers.onAgent?.(event.agent);
+      } else if (event.type === "step") {
+        if (event.content) handlers.onStep?.(event.content);
       } else if (event.type === "token") {
         fullText = event.content ?? "";
         handlers.onChunk?.(fullText);

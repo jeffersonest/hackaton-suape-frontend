@@ -25,7 +25,7 @@ interface ChatContainerProps {
 }
 
 export function ChatContainer({ onClose }: ChatContainerProps) {
-  const { messages, isStreaming, send } = useChat();
+  const { messages, isStreaming, steps, send } = useChat();
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -207,11 +207,32 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
                   <div className={styles.aiAvatar}>
                     <img src={AGENT_MARK} alt="" className={styles.markImg} />
                   </div>
-                  <div className={`${styles.bubble} ${styles.typing}`}>
-                    <span className={styles.dot} />
-                    <span className={styles.dot} />
-                    <span className={styles.dot} />
-                  </div>
+                  {steps.length > 0 ? (
+                    <div className={styles.stepsCard}>
+                      {steps.map((label, index) => {
+                        const isActive = index === steps.length - 1;
+                        return (
+                          <div key={label} className={styles.step}>
+                            <span
+                              className={isActive ? styles.stepSpinner : styles.stepDone}
+                              aria-hidden
+                            >
+                              {isActive ? "" : "✓"}
+                            </span>
+                            <span className={isActive ? styles.stepActive : styles.stepText}>
+                              {label}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className={`${styles.bubble} ${styles.typing}`}>
+                      <span className={styles.dot} />
+                      <span className={styles.dot} />
+                      <span className={styles.dot} />
+                    </div>
+                  )}
                 </div>
               )}
               <div ref={messagesEndRef} />

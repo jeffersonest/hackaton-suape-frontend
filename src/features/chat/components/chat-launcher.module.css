@@ -122,3 +122,47 @@
     height: 54px;
   }
 }
+
+.fabBusy {
+  background: var(--color-brand);
+}
+
+.fabBusy .fabPulse {
+  border-color: var(--color-brand);
+  animation-duration: 1.1s;
+}
+
+.fabLabel {
+  position: fixed;
+  bottom: 40px;
+  right: 96px;
+  z-index: var(--z-fab);
+  padding: 7px 12px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card, #fff);
+  color: var(--text-strong, #0e488a);
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(13, 30, 55, 0.18);
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fabLabelIn 0.2s ease-out;
+}
+
+@keyframes fabLabelIn {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .fabLabel {
+    bottom: 34px;
+    right: 84px;
+  }
+}
