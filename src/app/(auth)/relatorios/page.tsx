@@ -1,12 +1,5 @@
-import { ChartBar } from "@phosphor-icons/react/dist/ssr";
-import { PagePlaceholder } from "@/components/layout";
+import { AnalyticsDashboard } from "@/features/analytics";
 
 export default function RelatoriosPage() {
-  return (
-    <PagePlaceholder
-      title="Relatórios"
-      description="Visualize indicadores e relatórios das operações do Porto de Suape."
-      icon={ChartBar}
-    />
-  );
+  return <AnalyticsDashboard />;
 }

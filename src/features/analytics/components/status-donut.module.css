@@ -1,0 +1,100 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.title {
+  font-size: 12px;
+  font-weight: 700;
+  font-family: "Montserrat", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--color-primary);
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--color-gray-100);
+}
+
+.chart {
+  position: relative;
+  width: 100%;
+  height: 200px;
+}
+
+.centerLabel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  pointer-events: none;
+}
+
+.centerValue {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text-primary);
+}
+
+.centerCaption {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+/* Legenda própria — lista todas as categorias, inclusive count 0 */
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legendLabel {
+  flex: 1;
+  color: var(--text-secondary);
+}
+
+.legendCount {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 240px;
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+}

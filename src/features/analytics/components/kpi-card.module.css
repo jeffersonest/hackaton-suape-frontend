@@ -1,0 +1,67 @@
+.card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  border-left: 4px solid var(--color-primary);
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+  background: rgba(14, 111, 196, 0.1);
+  color: var(--color-primary);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.value {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Tons */
+.primary {
+  border-left-color: var(--color-primary);
+}
+
+.accent {
+  border-left-color: var(--color-accent);
+}
+
+.accent .iconWrap {
+  background: rgba(244, 174, 56, 0.18);
+  color: var(--color-accent-dark);
+}
+
+.danger {
+  border-left-color: var(--color-error);
+}
+
+.danger .iconWrap {
+  background: rgba(250, 82, 82, 0.12);
+  color: var(--color-error);
+}
