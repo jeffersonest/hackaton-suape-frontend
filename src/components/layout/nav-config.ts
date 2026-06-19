@@ -3,6 +3,7 @@
 import {
   House,
   FileText,
+  Handshake,
   ChartBar,
   UsersThree,
   Gear,
@@ -22,6 +23,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Início", href: "/home", icon: House, adminOnly: true },
   { label: "Licenças", href: "/licencas", icon: FileText },
+  { label: "Compromissos", href: "/compromissos", icon: Handshake },
   { label: "Relatórios", href: "/relatorios", icon: ChartBar },
   { label: "Gerenciar Usuários", href: "/usuarios", icon: UsersThree, adminOnly: true },
 ];

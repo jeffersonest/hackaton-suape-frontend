@@ -1,0 +1,369 @@
+.page {
+  padding: 4px 2px 40px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.headerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  border-radius: 14px;
+  background: rgba(14, 111, 196, 0.1);
+  color: var(--color-primary, #0e6fc4);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-family: "Montserrat", sans-serif;
+  color: var(--text-primary);
+}
+
+.subtitle {
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  text-align: left;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-primary, #0e6fc4);
+  box-shadow: var(--shadow-md);
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.cardNumber {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.statusChip {
+  flex: none;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cardObjeto {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cardMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.cardMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cardLink {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-primary, #0e6fc4);
+}
+
+/* ---- Modal ---- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(13, 30, 55, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-radius: 18px;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.modalHeaderInfo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modalEyebrow {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  font-family: "Montserrat", sans-serif;
+  color: var(--text-primary);
+}
+
+.closeBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: none;
+  border-radius: 50%;
+  background: var(--bg-elevated, rgba(0, 0, 0, 0.04));
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  background: rgba(250, 82, 82, 0.12);
+  color: #c92a2a;
+}
+
+.modalBody {
+  padding: 20px 22px 24px;
+  overflow-y: auto;
+}
+
+.section {
+  margin-bottom: 22px;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  font-family: "Montserrat", sans-serif;
+  color: var(--color-primary, #0e6fc4);
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px 18px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.infoLabel {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--text-muted);
+}
+
+.infoValue {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.objetoBox {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated, #f8fbfe);
+  border: 1px solid var(--border-default);
+}
+
+.objetoBox p {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
+.clauseText {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.mapWrap {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: 300px;
+  border: 0;
+}
+
+.mapMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.coords {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  color: var(--text-secondary);
+}
+
+.verticesTag {
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(14, 111, 196, 0.1);
+  color: var(--color-primary, #0e6fc4);
+  font-family: "Nunito Sans", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.mapActions {
+  display: flex;
+  gap: 10px;
+}
+
+.earthBtn,
+.mapsBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.earthBtn {
+  background: var(--color-primary, #0e6fc4);
+  color: #fff;
+}
+
+.earthBtn:hover {
+  filter: brightness(1.05);
+}
+
+.mapsBtn {
+  background: rgba(14, 111, 196, 0.1);
+  color: var(--color-primary, #0e6fc4);
+}
+
+.mapsBtn:hover {
+  background: rgba(14, 111, 196, 0.18);
+}
+
+.penaltySection {
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  background: rgba(250, 82, 82, 0.06);
+  border: 1px solid rgba(250, 82, 82, 0.25);
+}
+
+.penaltySection .sectionTitle {
+  color: #c92a2a;
+}
+
+.penaltyTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(250, 82, 82, 0.12);
+  color: #c92a2a;
+  font-size: 0.88rem;
+}
+
+.mockNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+@media (max-width: 560px) {
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  .mapMeta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
