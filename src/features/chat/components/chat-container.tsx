@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X, UploadSimple } from "@phosphor-icons/react";
+import { X, UploadSimple, Check } from "@phosphor-icons/react";
 import { useChat } from "@/features/chat/hooks";
 import type { PendingAttachment } from "../types";
 import { describeAttachment } from "../lib/attachments";
@@ -209,17 +209,28 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
                   </div>
                   {steps.length > 0 ? (
                     <div className={styles.stepsCard}>
+                      <span className={styles.stepsTitle}>Processando o documento</span>
                       {steps.map((label, index) => {
                         const isActive = index === steps.length - 1;
+                        const isLast = index === steps.length - 1;
                         return (
                           <div key={label} className={styles.step}>
+                            <div className={styles.stepMarker}>
+                              <span
+                                className={`${styles.stepDot} ${
+                                  isActive ? styles.stepDotActive : styles.stepDotDone
+                                }`}
+                                aria-hidden
+                              >
+                                {!isActive && <Check size={11} weight="bold" />}
+                              </span>
+                              {!isLast && <span className={styles.stepLine} />}
+                            </div>
                             <span
-                              className={isActive ? styles.stepSpinner : styles.stepDone}
-                              aria-hidden
+                              className={`${styles.stepLabel} ${
+                                isActive ? styles.stepLabelActive : ""
+                              }`}
                             >
-                              {isActive ? "" : "✓"}
-                            </span>
-                            <span className={isActive ? styles.stepActive : styles.stepText}>
                               {label}
                             </span>
                           </div>
