@@ -387,7 +387,7 @@ export function RequirementModal({
                 fulfillment={current}
                 requirement={requirement}
                 responsibleEmail={currentUser?.email}
-                responsibleName={currentUser?.name || currentUser?.email}
+                responsibleName={currentUser?.email}
                 isRecurring={isRecurring(requirement)}
                 onSaved={async () => {
                   await reloadFulfillments();
