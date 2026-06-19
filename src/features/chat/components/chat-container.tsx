@@ -172,7 +172,14 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
         <>
           <div className={styles.messages}>
             <div className={styles.messagesInner}>
-              {messages.map((message) => (
+              {messages.map((message) => {
+                // O placeholder vazio da IA (text: "" durante o streaming) não é
+                // renderizado aqui: o indicador de processamento (showTyping) já
+                // exibe o avatar + card de etapas. Renderizá-lo duplicaria o avatar.
+                if (message.role === "ai" && !message.text && !message.attachments?.length) {
+                  return null;
+                }
+                return (
                 <div
                   key={message.id}
                   className={`${styles.message} ${styles[message.role]}`}
@@ -201,7 +208,8 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
                     )}
                   </div>
                 </div>
-              ))}
+                );
+              })}
               {showTyping && (
                 <div className={`${styles.message} ${styles.ai}`}>
                   <div className={styles.aiAvatar}>
