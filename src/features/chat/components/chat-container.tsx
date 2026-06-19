@@ -55,8 +55,8 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
     const text = input.trim();
     if ((!text && attachments.length === 0) || isStreaming) return;
 
-    const meta = attachments.map(({ file: _file, ...rest }) => rest);
-    send(text, meta);
+    // Envia os anexos COM o File (upload multipart); o hook separa o que exibir.
+    send(text, attachments);
     setInput("");
     setAttachments([]);
   };

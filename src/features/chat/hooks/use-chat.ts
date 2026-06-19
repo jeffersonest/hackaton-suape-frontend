@@ -1,28 +1,41 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import type { ChatAttachment, ChatMessage } from "../types";
+import type { ChatMessage, PendingAttachment } from "../types";
 import { streamChat } from "../api/chat-api";
 
+const WELCOME: ChatMessage = {
+  id: "welcome",
+  role: "ai",
+  text: "Olá! Sou o Almirante, assistente digital do Porto de Suape. Como posso ajudá-lo hoje? Posso auxiliar com consultas sobre licenças, exigências, prazos e documentos das operações portuárias.",
+  timestamp: new Date(),
+};
+
+const ERROR_TEXT =
+  "Desculpe, houve um erro ao processar sua mensagem. Tente novamente.";
+
 export function useChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome",
-      role: "ai",
-      text: "Olá! Sou o Almirante, assistente digital do Porto de Suape. Como posso ajudá-lo hoje? Posso auxiliar com consultas sobre licenças, processos, documentos e outras informações relacionadas às operações portuárias.",
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([WELCOME]);
   const [isStreaming, setIsStreaming] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const conversationIdRef = useRef<string | null>(null);
 
-  const send = useCallback(async (text: string, attachments?: ChatAttachment[]) => {
+  const send = useCallback(async (text: string, attachments?: PendingAttachment[]) => {
+    const pending = attachments ?? [];
+    const files = pending.map((attachment) => attachment.file);
+    // Só os metadados (sem o File) acompanham a mensagem exibida.
+    const displayAttachments = pending.map(({ file: _file, ...rest }) => rest);
+
+    // O backend exige texto (min_length=1); se vier só anexo, usa um pedido padrão.
+    const outgoing =
+      text.trim() || (files.length ? "Analise e cadastre o(s) documento(s) anexado(s)." : text);
+
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: "user",
-      text,
+      text: outgoing,
       timestamp: new Date(),
-      attachments: attachments?.length ? attachments : undefined,
+      attachments: displayAttachments.length ? displayAttachments : undefined,
     };
 
     const aiMessageId = `ai-${Date.now()}`;
@@ -36,63 +49,50 @@ export function useChat() {
     setMessages((prev) => [...prev, userMessage, aiMessage]);
     setIsStreaming(true);
 
-    abortControllerRef.current = new AbortController();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
 
-    const apiMessage = attachments?.length
-      ? `${text}\n\n[Anexos: ${attachments.map((a) => a.name).join(", ")}]`
-      : text;
+    const updateAi = (patch: Partial<ChatMessage>) =>
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === aiMessageId ? { ...msg, ...patch } : msg)),
+      );
 
     try {
       await streamChat({
-        message: apiMessage,
-        onChunk: (chunk) => {
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === aiMessageId ? { ...msg, text: chunk } : msg
-            )
-          );
+        message: outgoing,
+        files,
+        conversationId: conversationIdRef.current,
+        signal: controller.signal,
+        onConversation: (conversationId) => {
+          conversationIdRef.current = conversationId;
         },
-        onComplete: () => {
-          setIsStreaming(false);
-        },
-        onError: () => {
-          setMessages((prev) =>
-            prev.map((msg) =>
-              msg.id === aiMessageId
-                ? { ...msg, text: "Desculpe, houve um erro ao processar sua mensagem. Tente novamente." }
-                : msg
-            )
-          );
-          setIsStreaming(false);
-        },
+        onChunk: (fullText) => updateAi({ text: fullText }),
+        onError: () => updateAi({ text: ERROR_TEXT }),
       });
     } catch {
-      setMessages((prev) =>
-        prev.map((msg) =>
-          msg.id === aiMessageId
-            ? { ...msg, text: "Desculpe, houve um erro ao processar sua mensagem. Tente novamente." }
-            : msg
-        )
-      );
+      // streamChat já chamou onError; nada além de encerrar o estado.
+    } finally {
       setIsStreaming(false);
+      abortControllerRef.current = null;
     }
   }, []);
 
+  const stop = useCallback(() => {
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = null;
+    setIsStreaming(false);
+  }, []);
+
   const clear = useCallback(() => {
-    setMessages([
-      {
-        id: "welcome",
-        role: "ai",
-        text: "Olá! Sou o Almirante, assistente digital do Porto de Suape. Como posso ajudá-lo hoje?",
-        timestamp: new Date(),
-      },
-    ]);
+    conversationIdRef.current = null;
+    setMessages([WELCOME]);
   }, []);
 
   return {
     messages,
     isStreaming,
     send,
+    stop,
     clear,
   };
 }

@@ -82,6 +82,24 @@ function refreshSession(): Promise<void> {
   return refreshInFlight;
 }
 
+/**
+ * Dispara o refresh single-flight e diz se a sessão foi renovada. Usado por
+ * fluxos que não passam pelo `request` (ex.: streaming SSE com fetch cru), para
+ * reaproveitar o mesmo refresh compartilhado e o tratamento de falha de sessão.
+ */
+export async function tryRefreshSession(): Promise<boolean> {
+  try {
+    await refreshSession();
+    return true;
+  } catch {
+    authFailureHandler?.();
+    return false;
+  }
+}
+
+/** URL base da API (mesma do cliente central), para fluxos com fetch cru. */
+export const apiBaseUrl = API_URL;
+
 async function toApiError(response: Response): Promise<ApiError> {
   let detail: unknown;
   try {
