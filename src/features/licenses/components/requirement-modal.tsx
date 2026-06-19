@@ -21,6 +21,7 @@ import {
   FloppyDisk,
   Buildings,
   MagnifyingGlass,
+  CaretDown,
 } from "@phosphor-icons/react";
 import {
   LicenseRequirement,
@@ -274,7 +275,7 @@ export function RequirementModal({
 
             {fulfillments.length === 0 ? (
               <p className={styles.emptyHint}>
-                Nenhum cumprimento registrado ainda. Clique em "Novo cumprimento" para criar.
+                Nenhum cumprimento registrado ainda. Use o botão abaixo para adicionar o primeiro.
               </p>
             ) : (
               <div className={styles.fulfillmentList}>
@@ -374,6 +375,38 @@ export function RequirementModal({
                   Nova ocorrência
                 </button>
               )
+            )}
+
+            {!isRecurring(requirement) && fulfillments.length === 0 && (
+              <button
+                type="button"
+                className={styles.addOccurrenceBtn}
+                disabled={creatingOccurrence}
+                onClick={async () => {
+                  setCreatingOccurrence(true);
+                  try {
+                    await upsertFulfillment(requirement.identifier, {
+                      status: "pendente",
+                      occurrence_due_date: null,
+                    });
+                    await reloadFulfillments();
+                    setSelectedOccurrence(null);
+                    onUpdated?.();
+                  } catch (err) {
+                    console.error(err);
+                    setError("Falha ao criar cumprimento.");
+                  } finally {
+                    setCreatingOccurrence(false);
+                  }
+                }}
+              >
+                {creatingOccurrence ? (
+                  <CircleNotch size={14} className={styles.spinning} />
+                ) : (
+                  <Plus size={14} weight="bold" />
+                )}
+                Adicionar cumprimento
+              </button>
             )}
           </section>
 
@@ -775,12 +808,11 @@ function AreaSelect({ value, onChange }: AreaSelectProps) {
     (value ? { name: value, acronym: value } : null);
 
   const q = query.trim().toLowerCase();
-  const showList = q.length >= 3;
-  const filtered = showList
+  const filtered = q
     ? clients.filter(
         (c) => c.name.toLowerCase().includes(q) || c.acronym.toLowerCase().includes(q)
       )
-    : [];
+    : clients;
 
   if (selected) {
     return (
@@ -810,7 +842,7 @@ function AreaSelect({ value, onChange }: AreaSelectProps) {
         <input
           type="text"
           className={styles.areaInput}
-          placeholder="Buscar área (ex.: GML, ambiental, jurídica...)"
+          placeholder="Selecione ou busque a área (ex.: GML, ambiental...)"
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -818,8 +850,9 @@ function AreaSelect({ value, onChange }: AreaSelectProps) {
           }}
           onFocus={() => setOpen(true)}
         />
+        <CaretDown size={14} className={open ? styles.areaCaretOpen : styles.areaCaret} />
       </div>
-      {open && showList && (
+      {open && (
         <ul className={styles.areaList}>
           {filtered.length === 0 ? (
             <li className={styles.areaEmpty}>Nenhuma área encontrada</li>

@@ -848,3 +848,16 @@ h2.headerTitle {
   background: rgba(250, 82, 82, 0.12);
   color: var(--color-error, #c92a2a);
 }
+
+.areaCaret {
+  flex: none;
+  color: var(--text-muted);
+  transition: transform 0.15s ease;
+}
+
+.areaCaretOpen {
+  flex: none;
+  color: var(--color-brand);
+  transform: rotate(180deg);
+  transition: transform 0.15s ease;
+}
