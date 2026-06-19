@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CaretLeft } from "@phosphor-icons/react";
 import { useSessionStore } from "@/features/auth";
+import { landingPathFor } from "@/lib/routes";
 import { NAV_ITEMS, NAV_FOOTER_ITEMS, isActiveRoute } from "./nav-config";
 import styles from "./sidebar.module.css";
 
@@ -51,7 +52,7 @@ export function Sidebar({
       }`}
     >
       <div className={styles.brand}>
-        <Link href="/home" className={styles.logo} onClick={onNavigate}>
+        <Link href={landingPathFor(isAdmin)} className={styles.logo} onClick={onNavigate}>
           <img src="/images/logo-suape.png" alt="Suape" className={styles.logoFull} />
           <img src="/images/logo-suape-mark.png" alt="Suape" className={styles.logoMark} />
         </Link>

@@ -21,6 +21,7 @@ import {
   parseApiError,
   type User,
 } from "@/features/users";
+import { landingPathFor } from "@/lib/routes";
 import styles from "./usuarios.module.css";
 
 const LIMIT = 20;
@@ -43,7 +44,7 @@ export default function UsuariosPage() {
 
   // Guarda de acesso na UI: a rota é admin-only (o backend ainda devolve 403).
   useEffect(() => {
-    if (me && !me.is_admin) router.replace("/home");
+    if (me && !me.is_admin) router.replace(landingPathFor(false));
   }, [me, router]);
 
   const load = useCallback(async () => {

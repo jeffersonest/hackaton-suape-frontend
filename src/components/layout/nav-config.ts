@@ -8,6 +8,7 @@ import {
   Gear,
   type Icon,
 } from "@phosphor-icons/react";
+import { landingPathFor } from "@/lib/routes";
 
 export interface NavItem {
   label: string;
@@ -19,7 +20,7 @@ export interface NavItem {
 
 /** Itens principais do menu lateral. */
 export const NAV_ITEMS: NavItem[] = [
-  { label: "Início", href: "/home", icon: House },
+  { label: "Início", href: "/home", icon: House, adminOnly: true },
   { label: "Licenças", href: "/licencas", icon: FileText },
   { label: "Relatórios", href: "/relatorios", icon: ChartBar },
   { label: "Gerenciar Usuários", href: "/usuarios", icon: UsersThree, adminOnly: true },
@@ -39,18 +40,23 @@ export interface Crumb {
 
 /**
  * Monta a trilha de navegação a partir do pathname atual.
- * Sempre inicia em "Início" e adiciona a página atual quando não é a home.
+ *
+ * A base depende do papel: admins partem de "Início" (/home); usuários comuns
+ * não têm a home, então partem de "Licenças" (seu ponto de entrada).
  */
-export function getBreadcrumb(pathname: string): Crumb[] {
-  const home: Crumb = { label: "Início", href: "/home" };
-  if (pathname === "/home" || pathname === "/") return [home];
+export function getBreadcrumb(pathname: string, isAdmin = true): Crumb[] {
+  const baseHref = landingPathFor(isAdmin);
+  const baseLabel = isAdmin ? "Início" : "Licenças";
+  const base: Crumb = { label: baseLabel, href: baseHref };
+
+  if (pathname === baseHref || pathname === "/home" || pathname === "/") return [base];
 
   const match = ALL_ITEMS.find(
     (item) => item.href !== "/home" && pathname.startsWith(item.href)
   );
 
-  if (!match) return [home];
-  return [home, { label: match.label, href: match.href }];
+  if (!match || match.href === baseHref) return [base];
+  return [base, { label: match.label, href: match.href }];
 }
 
 /** Verifica se um item de navegação corresponde à rota atual. */

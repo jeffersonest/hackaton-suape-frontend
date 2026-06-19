@@ -7,6 +7,7 @@ import { useSessionStore } from "../stores/session-store";
 import { login as apiLogin } from "../api/auth-api";
 import { loginErrorMessage } from "../lib/errors";
 import type { LoginCredentials } from "../types";
+import { landingPathFor } from "@/lib/routes";
 import styles from "./login-form.module.css";
 
 interface LoginFormProps {
@@ -38,7 +39,7 @@ export function LoginForm({ onSuccess }: LoginFormProps) {
       setUser(user);
 
       onSuccess?.();
-      router.replace("/home");
+      router.replace(landingPathFor(user.is_admin));
     } catch (err) {
       setError(loginErrorMessage(err));
     } finally {

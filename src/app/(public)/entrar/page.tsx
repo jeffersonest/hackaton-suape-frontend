@@ -6,17 +6,19 @@ import { useRouter } from "next/navigation";
 import { ClipboardText, ChartLine, Shield } from "@phosphor-icons/react";
 import { LoginForm, AuthSplash } from "@/features/auth/components";
 import { useSessionStore } from "@/features/auth";
+import { landingPathFor } from "@/lib/routes";
 import styles from "./login.module.css";
 
 export default function LoginPage() {
   const router = useRouter();
   const status = useSessionStore((state) => state.status);
+  const user = useSessionStore((state) => state.user);
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/home");
+      router.replace(landingPathFor(user?.is_admin));
     }
-  }, [status, router]);
+  }, [status, user, router]);
 
   // Enquanto verifica a sessão (loading) ou se já está logado, mostra o splash
   // para evitar o flash do formulário antes do redirecionamento.

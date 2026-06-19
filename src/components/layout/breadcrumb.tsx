@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CaretRight, House } from "@phosphor-icons/react";
+import { useSessionStore } from "@/features/auth";
 import { getBreadcrumb } from "./nav-config";
 import styles from "./breadcrumb.module.css";
 
 export function Breadcrumb() {
   const pathname = usePathname();
-  const crumbs = getBreadcrumb(pathname);
+  const isAdmin = useSessionStore((state) => state.user?.is_admin ?? false);
+  const crumbs = getBreadcrumb(pathname, isAdmin);
 
   return (
     <nav className={styles.breadcrumb} aria-label="Trilha de navegação">
