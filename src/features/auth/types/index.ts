@@ -1,7 +1,10 @@
-/** Usuário autenticado, no formato retornado pelo backend. */
+/** Usuário autenticado, no formato retornado pelo backend (/auth/me e login). */
 export interface AuthUser {
   identifier: string;
   email: string;
+  is_active: boolean;
+  is_admin: boolean;
+  created_at: string;
 }
 
 export interface LoginCredentials {

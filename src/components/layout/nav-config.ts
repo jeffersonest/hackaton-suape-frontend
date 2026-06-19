@@ -4,6 +4,7 @@ import {
   House,
   FileText,
   ChartBar,
+  UsersThree,
   Gear,
   type Icon,
 } from "@phosphor-icons/react";
@@ -12,6 +13,8 @@ export interface NavItem {
   label: string;
   href: string;
   icon: Icon;
+  /** Item visível apenas para usuários administradores (is_admin). */
+  adminOnly?: boolean;
 }
 
 /** Itens principais do menu lateral. */
@@ -19,6 +22,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "Início", href: "/home", icon: House },
   { label: "Licenças", href: "/licencas", icon: FileText },
   { label: "Relatórios", href: "/relatorios", icon: ChartBar },
+  { label: "Gerenciar Usuários", href: "/usuarios", icon: UsersThree, adminOnly: true },
 ];
 
 /** Itens fixados na base do menu lateral. */

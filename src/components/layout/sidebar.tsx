@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CaretLeft } from "@phosphor-icons/react";
+import { useSessionStore } from "@/features/auth";
 import { NAV_ITEMS, NAV_FOOTER_ITEMS, isActiveRoute } from "./nav-config";
 import styles from "./sidebar.module.css";
 
@@ -20,6 +21,9 @@ export function Sidebar({
   onNavigate,
 }: SidebarProps) {
   const pathname = usePathname();
+  const isAdmin = useSessionStore((state) => state.user?.is_admin ?? false);
+
+  const navItems = NAV_ITEMS.filter((item) => !item.adminOnly || isAdmin);
 
   const renderItem = (item: (typeof NAV_ITEMS)[number]) => {
     const Icon = item.icon;
@@ -61,7 +65,7 @@ export function Sidebar({
         </button>
       </div>
 
-      <nav className={styles.nav}>{NAV_ITEMS.map(renderItem)}</nav>
+      <nav className={styles.nav}>{navItems.map(renderItem)}</nav>
 
       <div className={styles.footer}>{NAV_FOOTER_ITEMS.map(renderItem)}</div>
     </aside>
