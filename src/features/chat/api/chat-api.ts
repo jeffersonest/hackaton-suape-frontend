@@ -2,16 +2,11 @@ import { apiBaseUrl, tryRefreshSession } from "@/lib/api-client";
 
 export interface StreamChatOptions {
   message: string;
-  /** Arquivos a enviar junto (PDF de licença, imagens a anexar, etc.). */
   files?: File[];
-  /** Conversa existente para manter o histórico no backend. */
   conversationId?: string | null;
   signal?: AbortSignal;
-  /** Recebe o texto ACUMULADO da resposta a cada token. */
   onChunk?: (fullText: string) => void;
-  /** Nome do agente especialista ativo (handoff do supervisor). */
   onAgent?: (agent: string) => void;
-  /** Id da conversa resolvido pelo backend (primeiro evento). */
   onConversation?: (conversationId: string) => void;
   onComplete?: (fullText: string) => void;
   onError?: (error: Error) => void;
@@ -24,12 +19,6 @@ interface SseEvent {
   conversation_id?: string;
 }
 
-/**
- * Conversa com o agente via SSE real (`POST /chat/messages`, multipart). Lê o
- * corpo como stream, separa eventos por `\n\n`, e despacha cada `data: {json}`.
- * Em 401 renova a sessão uma vez (mesmo refresh single-flight do api-client) e
- * refaz a requisição. Retorna o texto final completo.
- */
 export async function streamChat(options: StreamChatOptions): Promise<string> {
   const {
     message,
@@ -99,8 +88,7 @@ async function consumeStream(
   let buffer = "";
   let fullText = "";
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
+  for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
@@ -117,15 +105,11 @@ async function consumeStream(
       if (event.type === "conversation" && event.conversation_id) {
         handlers.onConversation?.(event.conversation_id);
       } else if (event.type === "handoff") {
-        // Novo especialista assume: zera o acumulado para a próxima fala
-        // substituir a anterior (evita concatenar respostas de agentes distintos).
         if (event.agent) handlers.onAgent?.(event.agent);
-        fullText = "";
       } else if (event.type === "token") {
-        fullText += event.content ?? "";
+        fullText = event.content ?? "";
         handlers.onChunk?.(fullText);
       } else if (event.type === "done") {
-        // O backend manda a resposta final consolidada — fonte da verdade.
         if (event.content) {
           fullText = event.content;
           handlers.onChunk?.(fullText);
@@ -139,7 +123,6 @@ async function consumeStream(
   return fullText;
 }
 
-/** Extrai o JSON de um bloco SSE (linhas `data:` concatenadas). */
 function parseEvent(rawEvent: string): SseEvent | null {
   const data = rawEvent
     .split("\n")

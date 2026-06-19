@@ -11,8 +11,8 @@ const WELCOME: ChatMessage = {
 };
 
 const ERROR_TEXT = "Desculpe, houve um erro ao processar sua mensagem. Tente novamente.";
+const ATTACHMENT_ONLY_PROMPT = "Analise e cadastre o(s) documento(s) anexado(s).";
 
-// Fora do estado/persistência: o AbortController não é serializável e é efêmero.
 let abortController: AbortController | null = null;
 
 interface ChatState {
@@ -24,11 +24,6 @@ interface ChatState {
   clear: () => void;
 }
 
-/**
- * Estado do chat compartilhado entre as superfícies (página inicial e a bolinha)
- * e persistido em localStorage. Assim as mensagens não se perdem ao trocar de
- * tela nem ao recarregar, e o conversation_id mantém a mesma conversa no backend.
- */
 export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
@@ -39,14 +34,9 @@ export const useChatStore = create<ChatState>()(
       send: async (text, attachments) => {
         const pending = attachments ?? [];
         const files = pending.map((attachment) => attachment.file);
-        // Mantém o previewUrl (blob) para o preview ao vivo; ele é removido só na
-        // persistência (partialize), pois o blob URL não sobrevive ao reload.
         const displayAttachments = pending.map(({ file: _file, ...rest }) => rest);
 
-        // O backend exige texto (min_length=1); se vier só anexo, usa um pedido padrão.
-        const outgoing =
-          text.trim() ||
-          (files.length ? "Analise e cadastre o(s) documento(s) anexado(s)." : text);
+        const outgoing = text.trim() || (files.length ? ATTACHMENT_ONLY_PROMPT : text);
         if (!outgoing) return;
 
         const userMessage: ChatMessage = {
@@ -89,7 +79,7 @@ export const useChatStore = create<ChatState>()(
             onError: () => patchAi({ text: ERROR_TEXT }),
           });
         } catch {
-          // streamChat já chamou onError; nada além de encerrar o estado.
+          patchAi({ text: ERROR_TEXT });
         } finally {
           set({ isStreaming: false });
           abortController = null;
@@ -111,10 +101,7 @@ export const useChatStore = create<ChatState>()(
     {
       name: "suape-chat",
       storage: createJSONStorage(() => localStorage),
-      // Hidrata manualmente no cliente (evita mismatch de hidratação no SSR).
       skipHydration: true,
-      // Persiste só o necessário; isStreaming nunca (não pode ficar travado em
-      // true) e previewUrl (blob) é descartado, pois não sobrevive ao reload.
       partialize: (state) => ({
         conversationId: state.conversationId,
         messages: state.messages.map((message) =>
