@@ -3,7 +3,6 @@
 import {
   House,
   FileText,
-  FolderOpen,
   ChartBar,
   Gear,
   type Icon,
@@ -19,7 +18,6 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { label: "Início", href: "/home", icon: House },
   { label: "Licenças", href: "/licencas", icon: FileText },
-  { label: "Documentos", href: "/documentos", icon: FolderOpen },
   { label: "Relatórios", href: "/relatorios", icon: ChartBar },
 ];
 
