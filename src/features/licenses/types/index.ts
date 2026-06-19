@@ -39,10 +39,16 @@ export interface RequirementFulfillment {
   regulator_deadline: string | null;
   compliance_weight: number;
   sei_process_number: string | null;
+  responsible_area: string | null;
   evidence_note: string | null;
   completed_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface InternalClient {
+  name: string;
+  acronym: string;
 }
 
 export interface LicenseRequirement {
@@ -69,6 +75,7 @@ export interface UpsertFulfillmentData {
   regulator_deadline?: string | null;
   compliance_weight?: number;
   sei_process_number?: string | null;
+  responsible_area?: string | null;
   evidence_note?: string | null;
 }
 

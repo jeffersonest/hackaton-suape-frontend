@@ -19,12 +19,15 @@ import {
   Tag,
   Plus,
   FloppyDisk,
+  Buildings,
+  MagnifyingGlass,
 } from "@phosphor-icons/react";
 import {
   LicenseRequirement,
   LicenseFile,
   RequirementFulfillment,
   FulfillmentStatus,
+  InternalClient,
   REQUIREMENT_CATEGORY_LABELS,
   DEADLINE_TYPE_LABELS,
   FULFILLMENT_STATUS_LABELS,
@@ -34,6 +37,7 @@ import {
   deleteFile,
   fetchFulfillments,
   upsertFulfillment,
+  fetchInternalClients,
   formatFileSize,
   isImage,
 } from "@/features/licenses/api";
@@ -553,6 +557,9 @@ function FulfillmentEditor({
   const [internalDeadline, setInternalDeadline] = useState(fulfillment.internal_deadline || "");
   const [regulatorDeadline, setRegulatorDeadline] = useState(fulfillment.regulator_deadline || "");
   const [complianceWeight, setComplianceWeight] = useState(fulfillment.compliance_weight);
+  const [responsibleArea, setResponsibleArea] = useState<string | null>(
+    fulfillment.responsible_area || null
+  );
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -564,8 +571,9 @@ function FulfillmentEditor({
     setInternalDeadline(fulfillment.internal_deadline || "");
     setRegulatorDeadline(fulfillment.regulator_deadline || "");
     setComplianceWeight(fulfillment.compliance_weight);
+    setResponsibleArea(fulfillment.responsible_area || null);
     setSaved(false);
-  }, [fulfillment.identifier, fulfillment.status, fulfillment.sei_process_number, fulfillment.evidence_note, fulfillment.internal_deadline, fulfillment.regulator_deadline, fulfillment.compliance_weight]);
+  }, [fulfillment.identifier, fulfillment.status, fulfillment.sei_process_number, fulfillment.evidence_note, fulfillment.internal_deadline, fulfillment.regulator_deadline, fulfillment.compliance_weight, fulfillment.responsible_area]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -579,6 +587,7 @@ function FulfillmentEditor({
         regulator_deadline: regulatorDeadline || null,
         compliance_weight: complianceWeight,
         sei_process_number: seiProcessNumber.trim() || null,
+        responsible_area: responsibleArea,
         evidence_note: evidenceNote.trim() || null,
       });
       setSaved(true);
@@ -670,6 +679,15 @@ function FulfillmentEditor({
         </p>
       </div>
 
+      {/* Área responsável */}
+      <div className={styles.fieldGroup}>
+        <label className={styles.fieldLabel}>Área responsável (SUAPE)</label>
+        <AreaSelect value={responsibleArea} onChange={setResponsibleArea} />
+        <p className={styles.fieldHint}>
+          Área que busca o SEI e cuida desta exigência. Digite ao menos 3 letras para filtrar.
+        </p>
+      </div>
+
       {/* Evidência / observação */}
       <div className={styles.fieldGroup}>
         <label className={styles.fieldLabel}>Evidência / Observação</label>
@@ -720,5 +738,111 @@ function FulfillmentEditor({
         )}
       </button>
     </section>
+  );
+}
+
+interface AreaSelectProps {
+  value: string | null;
+  onChange: (value: string | null) => void;
+}
+
+function AreaSelect({ value, onChange }: AreaSelectProps) {
+  const [clients, setClients] = useState<InternalClient[]>([]);
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    let active = true;
+    fetchInternalClients()
+      .then((data) => active && setClients(data))
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
+  const selected =
+    clients.find((c) => c.acronym === value) ||
+    (value ? { name: value, acronym: value } : null);
+
+  const q = query.trim().toLowerCase();
+  const showList = q.length >= 3;
+  const filtered = showList
+    ? clients.filter(
+        (c) => c.name.toLowerCase().includes(q) || c.acronym.toLowerCase().includes(q)
+      )
+    : [];
+
+  if (selected) {
+    return (
+      <div className={styles.areaSelected}>
+        <Buildings size={16} weight="duotone" />
+        <span className={styles.areaBadge}>{selected.acronym}</span>
+        <span className={styles.areaName}>{selected.name}</span>
+        <button
+          type="button"
+          className={styles.areaClear}
+          onClick={() => {
+            onChange(null);
+            setQuery("");
+          }}
+          aria-label="Trocar área"
+        >
+          <X size={14} weight="bold" />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.areaSelect} ref={boxRef}>
+      <div className={styles.areaInputWrap}>
+        <MagnifyingGlass size={16} />
+        <input
+          type="text"
+          className={styles.areaInput}
+          placeholder="Buscar área (ex.: GML, ambiental, jurídica...)"
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+        />
+      </div>
+      {open && showList && (
+        <ul className={styles.areaList}>
+          {filtered.length === 0 ? (
+            <li className={styles.areaEmpty}>Nenhuma área encontrada</li>
+          ) : (
+            filtered.map((client) => (
+              <li key={client.acronym}>
+                <button
+                  type="button"
+                  className={styles.areaOption}
+                  onClick={() => {
+                    onChange(client.acronym);
+                    setQuery("");
+                    setOpen(false);
+                  }}
+                >
+                  <span className={styles.areaBadge}>{client.acronym}</span>
+                  <span className={styles.areaOptionName}>{client.name}</span>
+                </button>
+              </li>
+            ))
+          )}
+        </ul>
+      )}
+    </div>
   );
 }

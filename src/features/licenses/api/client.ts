@@ -6,6 +6,7 @@ import type {
   PaginatedResponse,
   RequirementFulfillment,
   UpsertFulfillmentData,
+  InternalClient,
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -103,6 +104,17 @@ export async function upsertFulfillment(
       body: JSON.stringify(data),
     }
   );
+}
+
+// INTERNAL CLIENTS
+
+let internalClientsCache: InternalClient[] | null = null;
+
+export async function fetchInternalClients(): Promise<InternalClient[]> {
+  if (internalClientsCache) return internalClientsCache;
+  const data = await apiFetch<InternalClient[]>('/internal-clients');
+  internalClientsCache = data;
+  return data;
 }
 
 // FILES
