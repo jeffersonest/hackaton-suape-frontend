@@ -145,6 +145,19 @@ Assistente de IA com **streaming SSE** e **markdown**.
 - **Drag-and-drop:** arrastar um arquivo em **qualquer lugar da tela** mostra o
   overlay tracejado "Solte os arquivos para anexar" (detecção a nível de `window`).
 
+```mermaid
+flowchart TD
+    U[Usuário envia mensagem / arrasta PDF] --> POST[POST /chat/messages<br/>FormData + stream SSE]
+    POST --> EV{evento SSE}
+    EV -->|conversation| CID[guarda o conversation_id]
+    EV -->|handoff| HO[troca de agente — silencioso]
+    EV -->|step| STEP[card de etapas avança]
+    EV -->|token| TOK[substitui o texto da resposta]
+    EV -->|done| DONE[resposta final salva no store]
+    EV -->|error| ERR[exibe mensagem de erro]
+    DONE --> SHARE["chat-store (Zustand persist)<br/>compartilhado: home + bolha"]
+```
+
 ### Licenças — `features/licenses`
 
 - **Listagem** com filtros e status, e **detalhe** (`/licencas/[id]`) em abas:
@@ -212,6 +225,20 @@ Assistente de IA com **streaming SSE** e **markdown**.
   (purge), `fetchRequirements`, `fetchFulfillments`, `upsertFulfillment`,
   `fetchInternalClients`, `fetchLicenseFiles` / `uploadRequirementFile` /
   `deleteFile`, `fetchNotifications` / `markNotificationAsRead`.
+
+```mermaid
+flowchart TD
+    REQ[Requisição à API] --> R{status}
+    R -->|2xx| OK[resposta]
+    R -->|401| RF{refresh já em andamento?}
+    RF -->|não| DO["POST /auth/refresh<br/>(single-flight)"]
+    RF -->|sim| WAIT[aguarda o refresh compartilhado]
+    DO --> OKREF{refresh ok?}
+    WAIT --> OKREF
+    OKREF -->|sim| RETRY[repete a requisição 1x]
+    OKREF -->|não| LOGOUT[limpa sessão → RouteGuard → /entrar]
+    RETRY --> OK
+```
 
 ---
 
