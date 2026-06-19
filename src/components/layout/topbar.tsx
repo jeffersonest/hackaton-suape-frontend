@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { List, CaretDown, SignOut, UserCircle } from "@phosphor-icons/react";
 import { useSessionStore, authApi } from "@/features/auth";
+import { useChatStore } from "@/features/chat/stores/chat-store";
 import { Breadcrumb } from "./breadcrumb";
 import { Notifications } from "./notifications";
 import styles from "./topbar.module.css";
@@ -50,6 +51,9 @@ export function Topbar({ onToggleSidebar }: TopbarProps) {
       // Mesmo se a chamada falhar, limpamos o estado local por segurança.
     } finally {
       clearSession();
+      // Limpa o chat persistido (localStorage) para não vazar entre usuários
+      // que usam o mesmo navegador.
+      useChatStore.getState().clear();
       router.replace("/entrar");
     }
   };

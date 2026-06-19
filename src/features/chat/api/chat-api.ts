@@ -3,7 +3,6 @@ import { apiBaseUrl, tryRefreshSession } from "@/lib/api-client";
 export interface StreamChatOptions {
   message: string;
   files?: File[];
-  conversationId?: string | null;
   signal?: AbortSignal;
   onChunk?: (fullText: string) => void;
   onAgent?: (agent: string) => void;
@@ -23,7 +22,6 @@ export async function streamChat(options: StreamChatOptions): Promise<string> {
   const {
     message,
     files = [],
-    conversationId,
     signal,
     onChunk,
     onAgent,
@@ -32,10 +30,11 @@ export async function streamChat(options: StreamChatOptions): Promise<string> {
     onError,
   } = options;
 
+  // O thread do chat é derivado do usuário logado no backend (pelo token), não
+  // é mais escolhido pelo cliente — por isso não enviamos conversation_id.
   const buildForm = (): FormData => {
     const form = new FormData();
     form.append("message", message);
-    if (conversationId) form.append("conversation_id", conversationId);
     for (const file of files) form.append("files", file, file.name);
     return form;
   };

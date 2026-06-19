@@ -26,7 +26,7 @@ interface ChatState {
 
 export const useChatStore = create<ChatState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       messages: [WELCOME],
       conversationId: null,
       isStreaming: false,
@@ -72,7 +72,6 @@ export const useChatStore = create<ChatState>()(
           await streamChat({
             message: outgoing,
             files,
-            conversationId: get().conversationId,
             signal: abortController.signal,
             onConversation: (conversationId) => set({ conversationId }),
             onChunk: (fullText) => patchAi({ text: fullText }),

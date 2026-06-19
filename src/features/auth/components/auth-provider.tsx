@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { setAuthFailureHandler } from "@/lib/api-client";
+import { useChatStore } from "@/features/chat/stores/chat-store";
 import { getCurrentUser } from "../api/auth-api";
 import { useSessionStore } from "../stores/session-store";
 
@@ -18,7 +19,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const clearSession = useSessionStore((state) => state.clearSession);
 
   useEffect(() => {
-    setAuthFailureHandler(() => clearSession());
+    // Ao encerrar a sessão (logout, refresh falho ou bootstrap sem auth),
+    // limpamos o chat persistido para não vazar histórico entre usuários do
+    // mesmo navegador.
+    const endSession = () => {
+      clearSession();
+      useChatStore.getState().clear();
+    };
+    setAuthFailureHandler(endSession);
 
     let active = true;
     getCurrentUser()
@@ -26,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (active) setUser(user);
       })
       .catch(() => {
-        if (active) clearSession();
+        if (active) endSession();
       });
 
     return () => {
