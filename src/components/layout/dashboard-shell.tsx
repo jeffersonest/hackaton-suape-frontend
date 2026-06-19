@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { ChatLauncher } from "@/features/chat";
+import { NotificationsModal } from "@/features/notifications";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
 import styles from "./dashboard-shell.module.css";
@@ -46,6 +47,8 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
       {/* Telas internas exibem a bolinha flutuante do chat; a home já tem o chat centralizado */}
       {!isHome && <ChatLauncher />}
+
+      <NotificationsModal />
     </div>
   );
 }
