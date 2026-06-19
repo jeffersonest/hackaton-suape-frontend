@@ -51,6 +51,15 @@ export interface InternalClient {
   acronym: string;
 }
 
+export interface PurgeLicenseResult {
+  requirements: number;
+  rag_chunks: number;
+  files: number;
+  audit_events: number;
+  deadline_alerts: number;
+  notifications: number;
+}
+
 export interface LicenseRequirement {
   identifier: string;
   license_id: string;

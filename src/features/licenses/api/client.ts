@@ -7,6 +7,7 @@ import type {
   RequirementFulfillment,
   UpsertFulfillmentData,
   InternalClient,
+  PurgeLicenseResult,
 } from '../types';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -72,6 +73,10 @@ export async function fetchLicenses(
 
 export async function fetchLicenseById(id: string): Promise<License> {
   return apiFetch<License>(`/licenses/${id}`);
+}
+
+export async function deleteLicense(id: string): Promise<PurgeLicenseResult> {
+  return apiFetch<PurgeLicenseResult>(`/licenses/${id}`, { method: 'DELETE' });
 }
 
 // REQUIREMENTS

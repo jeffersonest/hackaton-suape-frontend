@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
+  TrashSimple,
   FileText,
   Buildings,
   MapPin,
@@ -33,6 +34,7 @@ import {
 import {
   fetchLicenseById,
   fetchLicenseFiles,
+  deleteLicense,
   License,
   LicenseFile,
   LicenseRequirement,
@@ -46,6 +48,7 @@ import {
   LicenseFiles,
 } from "@/features/licenses/components";
 import { AuditTimeline } from "@/features/audit";
+import { useSessionStore } from "@/features/auth";
 import styles from "./licenca-detalhe.module.css";
 
 function getFileIcon(tipo: string) {
@@ -103,10 +106,28 @@ function formatDateShort(dateStr?: string) {
 
 export default function LicencaDetalhePage() {
   const params = useParams();
+  const router = useRouter();
+  const isAdmin = useSessionStore((s) => s.user?.is_admin ?? false);
   const [licenca, setLicenca] = useState<License | null>(null);
   const [arquivosCount, setArquivosCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async () => {
+    if (!licenca) return;
+    setDeleting(true);
+    try {
+      await deleteLicense(licenca.identifier);
+      router.push("/licencas");
+    } catch (err) {
+      console.error("Erro ao remover licença:", err);
+      setError(err instanceof Error ? err.message : "Falha ao remover a licença.");
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
   const [activeTab, setActiveTab] = useState<"informacoes" | "exigencias" | "documentos" | "auditoria">(
     "informacoes"
   );
@@ -188,11 +209,36 @@ export default function LicencaDetalhePage() {
   return (
     <div className={styles.page}>
       {/* Header */}
-      <div className={styles.header}>
+      <div
+        className={styles.header}
+        style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+      >
         <Link href="/licencas" className={styles.backLink}>
           <ArrowLeft size={20} weight="bold" />
           Voltar para listagem
         </Link>
+        {isAdmin && (
+          <button
+            type="button"
+            onClick={() => setConfirmDelete(true)}
+            disabled={deleting}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "8px 14px",
+              borderRadius: 8,
+              border: "1px solid rgba(250, 82, 82, 0.4)",
+              background: "rgba(250, 82, 82, 0.08)",
+              color: "#c92a2a",
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            <TrashSimple size={16} weight="bold" />
+            Remover licença
+          </button>
+        )}
       </div>
 
       {/* Card Principal */}
@@ -597,6 +643,83 @@ export default function LicencaDetalhePage() {
             }
           }}
         />
+      )}
+
+      {confirmDelete && (
+        <div
+          onClick={() => !deleting && setConfirmDelete(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 1000,
+            background: "rgba(13, 30, 55, 0.55)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "var(--bg-card)",
+              borderRadius: 16,
+              maxWidth: 460,
+              width: "100%",
+              padding: 24,
+              boxShadow: "var(--shadow-lg)",
+            }}
+          >
+            <h3
+              style={{
+                margin: "0 0 10px",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                color: "#c92a2a",
+              }}
+            >
+              <Warning size={22} weight="duotone" />
+              Remover licença
+            </h3>
+            <p style={{ margin: "0 0 18px", color: "var(--text-secondary)", lineHeight: 1.55 }}>
+              Isto remove permanentemente a licença <strong>{licenca.number}</strong> e{" "}
+              <strong>todas</strong> as suas referências: exigências, cumprimentos, índice RAG,
+              anexos, auditoria e notificações. Esta ação é <strong>irreversível</strong>.
+            </p>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setConfirmDelete(false)}
+                disabled={deleting}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 16px",
+                  borderRadius: 8,
+                  border: "none",
+                  background: "#c92a2a",
+                  color: "#fff",
+                  fontWeight: 600,
+                  cursor: deleting ? "default" : "pointer",
+                  opacity: deleting ? 0.7 : 1,
+                }}
+              >
+                <TrashSimple size={16} weight="bold" />
+                {deleting ? "Removendo…" : "Remover definitivamente"}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
