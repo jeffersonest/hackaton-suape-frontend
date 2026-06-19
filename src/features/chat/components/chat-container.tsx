@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { X, UploadSimple, Check } from "@phosphor-icons/react";
 import { useChat } from "@/features/chat/hooks";
 import type { PendingAttachment } from "../types";
@@ -29,7 +29,6 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
   const [input, setInput] = useState("");
   const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
   const [isDragging, setIsDragging] = useState(false);
-  const dragDepth = useRef(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const hasConversation = messages.some((m) => m.role === "user");
@@ -38,10 +37,10 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const addFiles = (files: File[]) => {
+  const addFiles = useCallback((files: File[]) => {
     if (!files.length) return;
     setAttachments((prev) => [...prev, ...files.map(describeAttachment)]);
-  };
+  }, []);
 
   const removeAttachment = (id: string) => {
     setAttachments((prev) => {
@@ -55,39 +54,49 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
     const text = input.trim();
     if ((!text && attachments.length === 0) || isStreaming) return;
 
-    // Envia os anexos COM o File (upload multipart); o hook separa o que exibir.
     send(text, attachments);
     setInput("");
     setAttachments([]);
   };
 
-  // ---- Drag & drop ----
-  const handleDragEnter = (e: React.DragEvent) => {
-    if (!e.dataTransfer.types.includes("Files")) return;
-    e.preventDefault();
-    dragDepth.current += 1;
-    setIsDragging(true);
-  };
+  useEffect(() => {
+    let depth = 0;
+    const hasFiles = (e: DragEvent) =>
+      Array.from(e.dataTransfer?.types ?? []).includes("Files");
 
-  const handleDragOver = (e: React.DragEvent) => {
-    if (e.dataTransfer.types.includes("Files")) e.preventDefault();
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragDepth.current -= 1;
-    if (dragDepth.current <= 0) {
-      dragDepth.current = 0;
+    const onEnter = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      depth += 1;
+      setIsDragging(true);
+    };
+    const onOver = (e: DragEvent) => {
+      if (hasFiles(e)) e.preventDefault();
+    };
+    const onLeave = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      depth = Math.max(0, depth - 1);
+      if (depth === 0) setIsDragging(false);
+    };
+    const onDrop = (e: DragEvent) => {
+      if (!hasFiles(e)) return;
+      e.preventDefault();
+      depth = 0;
       setIsDragging(false);
-    }
-  };
+      if (e.dataTransfer?.files?.length) addFiles(Array.from(e.dataTransfer.files));
+    };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    dragDepth.current = 0;
-    setIsDragging(false);
-    if (e.dataTransfer.files?.length) addFiles(Array.from(e.dataTransfer.files));
-  };
+    window.addEventListener("dragenter", onEnter);
+    window.addEventListener("dragover", onOver);
+    window.addEventListener("dragleave", onLeave);
+    window.addEventListener("drop", onDrop);
+    return () => {
+      window.removeEventListener("dragenter", onEnter);
+      window.removeEventListener("dragover", onOver);
+      window.removeEventListener("dragleave", onLeave);
+      window.removeEventListener("drop", onDrop);
+    };
+  }, [addFiles]);
 
   const composer = (
     <Composer
@@ -108,13 +117,7 @@ export function ChatContainer({ onClose }: ChatContainerProps) {
   const showTyping = isStreaming && lastAiMessage?.text === "";
 
   return (
-    <div
-      className={styles.container}
-      onDragEnter={handleDragEnter}
-      onDragOver={handleDragOver}
-      onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
-    >
+    <div className={styles.container}>
       {onClose && (
         <header className={styles.header}>
           <div className={styles.headerContent}>
