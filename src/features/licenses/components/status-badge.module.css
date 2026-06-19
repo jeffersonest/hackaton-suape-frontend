@@ -1,0 +1,92 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.badge.sm {
+  padding: 3px 8px;
+  font-size: 11px;
+  gap: 4px;
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.badge.sm .icon {
+  width: 12px;
+  height: 12px;
+}
+
+/* ===== VARIANT: LIGHT (para fundo escuro/azul) ===== */
+.pendingLight {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.analysisLight {
+  background: rgba(255, 255, 255, 0.25);
+  color: white;
+}
+
+.approvedLight {
+  background: var(--color-success);
+  color: white;
+}
+
+.rejectedLight {
+  background: var(--color-error);
+  color: white;
+}
+
+.expiredLight {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.renewedLight {
+  background: var(--color-success);
+  color: white;
+}
+
+/* ===== VARIANT: DARK (para fundo claro) ===== */
+.pendingDark {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.analysisDark {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.approvedDark {
+  background: #d4edda;
+  color: #155724;
+}
+
+.rejectedDark {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.expiredDark {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.renewedDark {
+  background: #e2f0e6;
+  color: #276327;
+}
