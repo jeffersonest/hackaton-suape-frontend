@@ -1,0 +1,12 @@
+[Unit]
+Description=Suape frontend auto-deploy poller (GHCR pull)
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/suape_frontend
+ExecStart=/opt/suape_frontend/deploy/suape-frontend-deploy.sh
+
+[Install]
+WantedBy=multi-user.target

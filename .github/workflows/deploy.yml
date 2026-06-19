@@ -1,0 +1,38 @@
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-suape-frontend
+  cancel-in-progress: true
+
+# Deploy PULL-BASED: o CI builda e publica a imagem no GHCR. A VPS roda um
+# systemd timer (deploy/) que puxa a :latest e recria o container. A URL pública
+# da API é embutida no build (NEXT_PUBLIC_*).
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          build-args: |
+            NEXT_PUBLIC_API_URL=https://api.almirante.chat
+          tags: |
+            ghcr.io/jeffersonest/hackaton-suape-frontend:latest
+            ghcr.io/jeffersonest/hackaton-suape-frontend:${{ github.sha }}
